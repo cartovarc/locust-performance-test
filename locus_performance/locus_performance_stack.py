@@ -18,7 +18,7 @@ class LocusPerformanceStack(Stack):
         bucket = s3.Bucket.from_bucket_name(
             self,
             "locustPerformanceBucket",
-            bucket_name="locust-performance-test-cartovarc",
+            bucket_name="locustperformance",
         )
 
         application = ecsp.ApplicationLoadBalancedFargateService(
