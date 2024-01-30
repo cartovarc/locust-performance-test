@@ -11,4 +11,6 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
-    entrypoint: ["/bin/sh", "/tmp/entrypoint.sh"]
+      LOCUST_MASTER_HOST: ${LOCUST_MASTER_HOST}
+      LOCUST_MASTER_PORT: ${LOCUST_MASTER_PORT}
+    entrypoint: ["/bin/sh", "/tmp/entrypoint-worker.sh"]

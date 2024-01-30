@@ -8,7 +8,8 @@ logger = logging.getLogger()
 logger.setLevel(log_level)
 
 CLUSTER_NAME = os.environ.get("CLUSTER_NAME")
-SERVICE_NAME = os.environ.get("SERVICE_NAME")
+MASTER_SERVICE_NAME = os.environ.get("MASTER_SERVICE_NAME")
+WORKERS_SERVICE_NAME = os.environ.get("WORKERS_SERVICE_NAME")
 
 
 def lambda_handler(event: dict, context: dict):
@@ -25,13 +26,23 @@ def lambda_handler(event: dict, context: dict):
         logger.info("Object key does not match locustfile.py, exiting")
         return {"statusCode": 200}
 
-    logger.info("Starting restart of services in {0} cluster".format(CLUSTER_NAME))
+    logger.info("Starting restart of services")
 
     client = boto3.client("ecs")
     response = client.update_service(
-        cluster=CLUSTER_NAME, service=SERVICE_NAME, forceNewDeployment=True
+        cluster=CLUSTER_NAME,
+        service=MASTER_SERVICE_NAME,
+        forceNewDeployment=True,
     )
 
-    logger.info("Response from ECS: %s", response)
+    logger.info("Response from ECS MASTER: %s", response)
+
+    response = client.update_service(
+        cluster=CLUSTER_NAME,
+        service=WORKERS_SERVICE_NAME,
+        forceNewDeployment=True,
+    )
+
+    logger.info("Response from ECS WORKERS: %s", response)
 
     return {"statusCode": 200}
