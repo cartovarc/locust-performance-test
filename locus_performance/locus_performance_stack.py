@@ -5,7 +5,6 @@ from aws_cdk import (
     aws_iam as iam,
     aws_s3 as s3,
     aws_lambda,
-    aws_elasticloadbalancingv2 as elbv2,
     aws_servicediscovery as servicediscovery,
     Duration,
     aws_s3_notifications,
@@ -24,7 +23,7 @@ class LocusPerformanceStack(Stack):
         self.bucket = s3.Bucket.from_bucket_name(
             self,
             "locustPerformanceBucket",
-            bucket_name="answerscarlos123",
+            bucket_name="locustperformance",
         )
 
         vpc = ec2.Vpc(
@@ -63,6 +62,11 @@ class LocusPerformanceStack(Stack):
             public_load_balancer=True,
         )
         self.application_master = application_master
+
+        application_master.service.connections.allow_from_any_ipv4(
+            ec2.Port.tcp(locust_master_port),
+            "Allow inbound traffic on the locust master port",
+        )
 
         # Add the locust master port to the container
         application_master.task_definition.default_container.add_port_mappings(
@@ -144,7 +148,7 @@ class LocusPerformanceStack(Stack):
         )
 
     def setup_lambda_restart(self):
-        # Create a lambda to restart the locust service
+        """Create a lambda to restart the locust service"""
         lambda_restart_locust = aws_lambda.Function(
             self,
             "lambdaRestartLocust",
